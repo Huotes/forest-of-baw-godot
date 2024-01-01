@@ -26,7 +26,7 @@ func _physics_process(delta: float) -> void:
 	
 func gravity(delta: float) -> void:
 	velocity.y += delta * gravity_speed
-	
+	print("a")
 func move_behavior() -> void:
 	if player_ref != null:
 		var distance: Vector2 = player_ref.global_position - global_position
