@@ -31,12 +31,14 @@ func verify_position(direction: Vector2) -> void:
 	if direction.x > 0:
 		flip_h = false
 		suffix = "_right"
+		player.flipped = false
 		player.direction = -1
 		position = Vector2.ZERO
 		player.wall_ray.cast_to = Vector2(5.5, 0)
 	elif direction.x < 0:
 		flip_h = true
 		suffix = "_left"
+		player.flipped = true
 		player.direction = 1
 		position = Vector2(-2, 0)
 		player.wall_ray.cast_to = Vector2(-7.5, 0)
@@ -71,7 +73,7 @@ func vertical_behavior(direction: Vector2) -> void:
 		
 func horizontal_behavior(direction: Vector2) -> void:
 	if direction.x != 0:
-		animation.play("run")
+		animation.play("run" + suffix)
 	else:
 		animation.play("idle")
 
