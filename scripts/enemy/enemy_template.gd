@@ -16,6 +16,7 @@ var drop_list: Dictionary
 var player_ref: Player = null
 
 export(int) var speed
+export(int) var enemy_exp
 export(int) var gravity_speed
 export(int) var proximity_threshold
 export(int) var raycast_default_position
@@ -26,6 +27,7 @@ func _physics_process(delta: float) -> void:
 	verify_position()
 	texture.animate(velocity)
 	velocity = move_and_slide(velocity, Vector2.UP)
+	
 	
 func gravity(delta: float) -> void:
 	velocity.y += delta * gravity_speed
@@ -70,6 +72,7 @@ func verify_position() -> void:
 			
 func kill_enemy() -> void:
 	animation.play("kill")
+	get_tree().call_group("player_stats", "update_exp", enemy_exp)
 	spawn_item_probability()
 	
 	
