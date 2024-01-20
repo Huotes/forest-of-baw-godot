@@ -1,11 +1,14 @@
 extends KinematicBody2D
 class_name Player
 
+const SPELL: PackedScene = preload("res://scenes/player/spell_area.tscn")
+
 onready var player_sprite: Sprite = get_node("Texture")
 onready var wall_ray: RayCast2D = get_node("WallRay")
 onready var stats: Node = get_node("Stats")
 
 var velocity: Vector2
+var spell_offset: Vector2 = Vector2(100, -50)
 
 var direction: int = 1
 var jump_count: int = 0
@@ -28,6 +31,7 @@ export(int) var wall_jump_speed
 
 export(int) var wall_gravity
 export(int) var player_gravity
+export(int) var magic_attack_cost
 export(int) var wall_impulse_speed
 
 func _physics_process(delta: float):
@@ -68,10 +72,14 @@ func actions_env() -> void:
 	defense()
 	
 func attack() -> void:
-	var attack_condition: bool = not attacking and not crouching and not defending
-	if Input.is_action_just_pressed("attack") and attack_condition and is_on_floor():
+	var attack_condition: bool = not attacking and not crouching and not defending and is_on_floor()
+	if Input.is_action_just_pressed("attack") and attack_condition:
 		attacking = true
 		player_sprite.normal_attack = true
+	elif Input.is_action_just_pressed("magic_attack") and attack_condition and stats.current_mana >= magic_attack_cost:
+		attacking = true
+		player_sprite.magic_attack = true
+		stats.update_mana("Decrease", magic_attack_cost)
 	
 func crouch() -> void:
 	if Input.is_action_pressed("crouch") and is_on_floor() and not defending:
@@ -126,3 +134,10 @@ func spawn_effect(effect_path, offset: Vector2, is_flipped: bool) -> void:
 		
 	effect_instance.global_position = global_position + offset
 	effect_instance.play_effect()
+
+
+func spawn_spell() -> void:
+	var spell: FireSpell = SPELL.instance()
+	spell.spell_damage = stats.base_magic_attack + stats.bonus_magic_attack
+	spell.global_position = global_position + spell_offset
+	get_tree().root.call_deferred("add_child", spell)
